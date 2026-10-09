@@ -8,17 +8,38 @@ class dataBase:
 
     def setUp(self):
         cursor = self.conn.cursor()
-        cursor.execute("""
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS category (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                type TEXT NOT NULL
+            )
+        ''')
+
+        count = cursor.execute('SELECT COUNT(*) FROM category').fetchone()[0]
+        if count == 0:
+            cursor.executemany(
+                'INSERT INTO category (name, type) VALUES (?,?)',
+                [
+                    ("食費","支出",),
+                    ("生活費","支出",),
+                    ("住居費","支出",),
+                    ("医療費","支出",)
+                ]
+            )
+
+        cursor.execute('''
             CREATE TABLE IF NOT EXISTS report (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 date TEXT,
                 description TEXT,
                 amount REAL,
-                category TEXT,
+                category_id INTEGER,
                 bank TEXT,
-                balance Text
+                balance TEXT,
+                FOREIGN KEY (category_id) REFERENCES category(id)
             )
-        """)
+        ''')
 
         self.conn.commit()
 
@@ -26,6 +47,13 @@ class dataBase:
         cursor = self.conn.cursor()
         cursor.execute(query,values)
         self.conn.commit()
+        return cursor
+    
+    def fetchQuery(self, query):
+        cursor = self.conn.cursor()
+        cursor.execute(query)
+        #items = cursor.fetchall()
+        return cursor
 
     def close(self):
         self.conn.close()
