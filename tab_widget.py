@@ -89,9 +89,11 @@ class TabWidget(QWidget):
         expenseMoney, self.expenseMoneyText = self.createMoneyWidget()
         # Set value for the combobox from category database
         cursor = self.data.fetchQuery('SELECT name FROM category WHERE type = "支出"')
-        expenceCategoryValues = cursor.fetchall()
-        expenseCategory, self.expenseCategoryText = self.createCategoryWidget(expenceCategoryValues)
-        expenseBank, self.expenseBankText = self.createBankWidget(['銀行'])
+        expenseCategoryValues = cursor.fetchall()
+        expenseCategory, self.expenseCategoryText = self.createCategoryWidget(expenseCategoryValues)
+        cursor = self.data.fetchQuery('SELECT name FROM bank')
+        expenseBankValues = cursor.fetchall()
+        expenseBank, self.expenseBankText = self.createBankWidget(expenseBankValues)
         expenseButton = self.createButton()
         expenseButton.clicked.connect(self.expenseButtonClick)
         # Set widget to expence tab layout
@@ -109,7 +111,9 @@ class TabWidget(QWidget):
         cursor = self.data.fetchQuery('SELECT name FROM category WHERE type = "収入"')
         incomeCategoryValues = cursor.fetchall()
         incomeCategory, self.incomeCategoryText = self.createCategoryWidget(incomeCategoryValues)
-        incomeBank, self.incomeBankText = self.createBankWidget(['銀行'])
+        cursor = self.data.fetchQuery('SELECT name FROM bank')
+        incomeBankValues = cursor.fetchall()
+        incomeBank, self.incomeBankText = self.createBankWidget(incomeBankValues)
         incomeButton = self.createButton()
         incomeButton.clicked.connect(self.incomeButtonClick)
         # Set widget to income layout
@@ -125,11 +129,9 @@ class TabWidget(QWidget):
         tabs.resize(200,100)
         # Add layout to expense tab
         expense_tab = QWidget()
-        expense_tab.layout=QVBoxLayout()
         expense_tab.setLayout(expenseLayout)
         # Add layout to income tab
         income_tab = QWidget()
-        income_tab.layout=QVBoxLayout()
         income_tab.setLayout(incomeLayout)
         #Add tab to UI
         tabs.addTab(expense_tab,'支出')
@@ -184,13 +186,13 @@ class TabWidget(QWidget):
 
         return categoryBox, categoryCombo
 
-    def createBankWidget(self, items):
+    def createBankWidget(self, values):
         # Set expense bank layout
         bankLabel = QLabel('出入先:')
         bankBox = QHBoxLayout()
         bankCombo = QComboBox()
-        for item in items:
-            bankCombo.addItem(item)
+        for value in values:
+            bankCombo.addItem(str(value[0]))
         bankButton = QPushButton('+')
         # Set widget to layout
         bankBox.addWidget(bankLabel, alignment=Qt.AlignmentFlag.AlignLeft)
@@ -223,12 +225,17 @@ class TabWidget(QWidget):
         cursor = self.data.exeQuery('SELECT id FROM category WHERE name = ?', (category_name,))
         category_id = cursor.fetchone()
         print(str(category_id[0]))
-        bank = self.expenseBankText.currentText()
-        print(bank)
+        # Get bank name from textbox and find the ID for the name throgh bank database 
+        bank_name = self.expenseBankText.currentText()
+        print(bank_name)
+        cursor = self.data.exeQuery('SELECT id FROM bank WHERE name = ?', (bank_name,))
+        bank_id = cursor.fetchone()
+        print(str(category_id[0]))
+        # Set expense as a value for balance
         balance = '支出'
         print(balance)
         # Insert data into database
-        self.data.exeQuery('INSERT INTO report(date,description,amount,category_id,bank,balance) VALUES(?,?,?,?,?,?)', (calendar,item,money,str(category_id[0]),bank,balance))
+        self.data.exeQuery('INSERT INTO report(date,description,amount,category_id,bank_id,balance) VALUES(?,?,?,?,?,?)', (calendar,item,money,str(category_id[0]),str(bank_id[0]),balance))
         # Clear out data from text box 
         self.expenseItemText.clear()
         self.expenseMoneyText.clear()
@@ -246,17 +253,25 @@ class TabWidget(QWidget):
         else:
             money = 0.00
         print(money)
-        # Get user input for category setting 
-        category = self.incomeCategoryText.currentText()
-        print(category)
-        # Get user input for bank setting
-        bank = self.incomeBankText.currentText()
-        print(bank)
-        # Set balance
+        # Get category name from textbox and find the ID for the name throgh category database 
+        category_name = self.expenseCategoryText.currentText()
+        print(category_name)
+        cursor = self.data.exeQuery('SELECT id FROM category WHERE name = ?', (category_name,))
+        category_id = cursor.fetchone()
+        print(str(category_id[0]))
+        # Get bank name from textbox and find the ID for the name throgh bank database 
+        bank_name = self.expenseBankText.currentText()
+        print(bank_name)
+        cursor = self.data.exeQuery('SELECT id FROM bank WHERE name = ?', (bank_name,))
+        bank_id = cursor.fetchone()
+        print(str(category_id[0]))
+        # Set income as a value for balance
         balance = '収入'
         print(balance)
-        # Set data above and xecute query to set data to database
-        self.data.exeQuery('INSERT INTO report(date,description,amount,category,bank,balance) VALUES(?,?,?,?,?,?)', (calendar,item,money,category,bank,balance))
+        # Insert data into database
+        self.data.exeQuery('INSERT INTO report(date,description,amount,category_id,bank_id,balance) VALUES(?,?,?,?,?,?)', (calendar,item,money,str(category_id[0]),str(bank_id[0]),balance))
+        # Clear out data from text box 
+        self.expenseItemText.clear()
         # Clear text from textbox
         self.expenseItemText.clear()
         self.expenseMoneyText.clear()
