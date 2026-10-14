@@ -9,7 +9,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         # Window title
-        self.setWindowTitle('空っぽな窓') 
+        self.setWindowTitle('家計簿') 
         # Window size
         self.setGeometry(200, 200, 500, 600) 
         # Set tab

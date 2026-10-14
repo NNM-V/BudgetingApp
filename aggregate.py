@@ -21,18 +21,18 @@ class AggregateData:
     def incomeSum(self,current_month):
         data = self.setData()
         data = data[data['balance'] == '収入']
-        self.incomeSum = data[data.index.month == current_month]['amount'].sum()
+        incomeSum = data[data.index.month == current_month]['amount'].sum()
 
-        return self.incomeSum
+        return incomeSum
 
     def expenseSum(self,current_month):
         data = self.setData()
         data = data[data['balance'] == '支出']
-        self.expenseSum = data[data.index.month == current_month]['amount'].sum()
+        expenseSum = data[data.index.month == current_month]['amount'].sum()
         
-        return self.expenseSum
+        return expenseSum
 
-    def Difference(self):
-        diff = self.incomeSum - self.expenseSum   
+    def Difference(self, income, expense):
+        diff = income - expense   
         
         return diff
