@@ -72,6 +72,12 @@ class dataBase:
         self.conn.commit()
         return cursor
     
+    def fetchQueryValue(self, query, values):
+        cursor = self.conn.cursor()
+        # Execute query
+        cursor.execute(query, values)
+        return cursor
+
     def fetchQuery(self, query):
         cursor = self.conn.cursor()
         # Execute query
