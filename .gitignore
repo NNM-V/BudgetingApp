@@ -1,8 +1,5 @@
 .DS_Store
 .venv
 tempCodeRunnerFile.py
-__pycache__/
 __pycache__
-__pycache__
-database
 database.db
