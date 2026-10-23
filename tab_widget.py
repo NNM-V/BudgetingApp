@@ -19,74 +19,77 @@ class TabWidget(QWidget):
         self.aggregateNum = AggregateData()
         # Tab layout
         self.tabs = QTabWidget()
-        self.tabs.resize(300,200)
         # Tab1 layout
-        self.createSummaryBox()
-        self.tab1 = QWidget()
-        self.tab1.layout=QVBoxLayout(self)
-        self.tab1.layout.addLayout(self.summaryLayout)
-        self.tab1.setLayout(self.tab1.layout)
+        self.createSummaryTab()
+        self.summaryTab = QWidget()
+        self.summaryTab.layout=QVBoxLayout(self)
+        self.summaryTab.setFixedHeight(200)
+        print(self.summaryTab.size())
+        self.summaryTab.layout.addLayout(self.summaryTabLayout)
+        self.summaryTab.setLayout(self.summaryTab.layout)
         # Tab2 layout
-        self.createInputBox()
-        self.tab2 = QWidget()
-        self.tab2.layout=QVBoxLayout(self)
-        self.tab2.layout.addLayout(self.inputLayout)
-        self.tab2.setLayout(self.tab2.layout)
-        self.tabs.addTab(self.tab1,'サマリー')
-        self.tabs.addTab(self.tab2,'入力')
+        self.createInputTab()
+        self.inputTab = QWidget()
+        self.inputTab.layout=QVBoxLayout(self)
+        self.inputTab.layout.addLayout(self.inputTabLayout)
+        self.inputTab.setLayout(self.inputTab.layout)
+
+        self.tabs.addTab(self.summaryTab,'サマリー')
+        self.tabs.addTab(self.inputTab,'入力')
+        self.tabs.currentChanged.connect(self.summaryTabClicked)
         self.layout.addWidget(self.tabs)
         # Set tab to layout
         self.setLayout(self.layout)
+    
+    def summaryTabClicked(self):
+        currentTab = self.tabs.currentIndex()
+        if currentTab == 0:
+            self.createLabel(self.current_month)
+            self.prevButton.clearFocus()
 
-    def createSummaryBox(self):
-        # SummaryBox main　layout
-        self.summaryLayout=QVBoxLayout()
+    def createSummaryTab(self):
+        # SummaryBox main layout
+        self.summaryTabLayout = QGridLayout()
         # Layout for month
         monthLayout = QHBoxLayout()
-        monthLabel = QLabel(str(self.current_month) + '月')
-        monthLayout.addWidget(monthLabel, alignment=Qt.AlignmentFlag.AlignCenter)
-        # Get aggregated data
-        incomeData = self.aggregateNum.incomeSum(self.current_month)
-        expenseData = self.aggregateNum.expenseSum(self.current_month)
-        balanceData = self.aggregateNum.Difference(incomeData, expenseData)
-        # Layout for income data
-        incomeLayout = QHBoxLayout()
+        self.prevButton = QPushButton('prev')
+        self.prevButton.setFixedWidth(40)
+        self.prevButton.clicked.connect(self.prevButtonClick)
+        self.monthLabel = QLabel(str(self.current_month) + '月')
+        self.monthLabel.setFixedWidth(30)
+        nextButton = QPushButton('next')
+        nextButton.setFixedWidth(40)
+        nextButton.clicked.connect(self.nextButtonClick)
+        monthLayout.addWidget(self.prevButton, alignment=Qt.AlignmentFlag.AlignRight)
+        monthLayout.addWidget(self.monthLabel, alignment=Qt.AlignmentFlag.AlignRight)
+        monthLayout.addWidget(nextButton, alignment=Qt.AlignmentFlag.AlignRight)
+        dataLayout = QGridLayout()
         incomeLabel = QLabel('収入:')
         self.incomeText = QLabel()
-        incomeLayout.addWidget(incomeLabel)
-        incomeLayout.addWidget(self.incomeText)
-        # Layout for expense data
-        expenseLayout = QHBoxLayout()
         expenseLabel = QLabel('支出:')
         self.expenseText = QLabel()
-        expenseLayout.addWidget(expenseLabel)
-        expenseLayout.addWidget(self.expenseText)
-        # Layout for balance data
-        balanceLayout = QHBoxLayout()
         balanceLabel = QLabel('収支:')
         self.balanceText = QLabel()
-        balanceLayout.addWidget(balanceLabel)
-        balanceLayout.addWidget(self.balanceText)
-        # Layout for budget data
-        budgetLayout = QHBoxLayout()
         budgetLabel = QLabel('予算:')
         self.budgetText = QLabel('0')
-        budgetLayout.addWidget(budgetLabel)
-        budgetLayout.addWidget(self.budgetText)
-        self.createLabel()
+        dataLayout.addWidget(incomeLabel, 0, 0, alignment=Qt.AlignmentFlag.AlignRight)
+        dataLayout.addWidget(self.incomeText, 0, 1, alignment=Qt.AlignmentFlag.AlignRight)
+        dataLayout.addWidget(balanceLabel, 0, 2, alignment=Qt.AlignmentFlag.AlignRight)
+        dataLayout.addWidget(self.balanceText, 0, 3, alignment=Qt.AlignmentFlag.AlignRight)
+        dataLayout.addWidget(expenseLabel, 1, 0, alignment=Qt.AlignmentFlag.AlignRight)
+        dataLayout.addWidget(self.expenseText, 1, 1, alignment=Qt.AlignmentFlag.AlignRight)
+        dataLayout.addWidget(budgetLabel, 1, 2, alignment=Qt.AlignmentFlag.AlignRight)
+        dataLayout.addWidget(self.budgetText, 1, 3, alignment=Qt.AlignmentFlag.AlignRight)
+        self.createLabel(self.current_month)
         # Add each layout to main layout
-        self.summaryLayout.addLayout(monthLayout)
-        self.summaryLayout.addLayout(incomeLayout)
-        self.summaryLayout.addLayout(expenseLayout)
-        self.summaryLayout.addLayout(balanceLayout)
-        self.summaryLayout.addLayout(budgetLayout)
+        self.summaryTabLayout.addLayout(monthLayout, 0, 0, 1, 1, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.summaryTabLayout.addLayout(dataLayout, 1, 0, 1, 1, alignment=Qt.AlignmentFlag.AlignCenter)
 
-    def createLabel(self):
+    def createLabel(self, month):
         # Get aggregated data
-        incomeData = self.aggregateNum.incomeSum(self.current_month)
-        expenseData = self.aggregateNum.expenseSum(self.current_month)
+        incomeData = self.aggregateNum.incomeSum(month)
+        expenseData = self.aggregateNum.expenseSum(month)
         balanceData = self.aggregateNum.Difference(incomeData, expenseData)
-        expenseData = self.aggregateNum.expenseSum(self.current_month)
         self.incomeText.setText(str(incomeData))
         self.expenseText.setText(str(expenseData))
         if balanceData == 0:
@@ -95,64 +98,61 @@ class TabWidget(QWidget):
             self.balanceText.setText('+' + str(balanceData))
         else:
             self.balanceText.setText(str(balanceData))
+    
+    def prevButtonClick(self):
+        self.current_month = self.current_month-1
+        self.monthLabel.setText(str(self.current_month) + '月')
+        # Get aggregated data
+        self.createLabel(self.current_month)
 
-    def createInputBox(self):
+    def nextButtonClick(self):
+        self.current_month = self.current_month+1
+        self.monthLabel.setText(str(self.current_month) + '月')
+        # Get aggregated data
+        self.createLabel(self.current_month)
+
+    def createInputTab(self):
         # Main layout
-        self.inputLayout = QVBoxLayout()
-        # Create widget for expence tab
-        self.expenseCalendar = self.createCalendarWidget()
-        expenseItem, self.expenseItemText = self.createItemWidget()
-        expenseMoney, self.expenseMoneyText = self.createMoneyWidget()
-        # Set value for the combobox from category database
-        cursor = self.data.fetchQuery('SELECT name FROM category WHERE type = "支出"')
-        expenseCategoryValues = cursor.fetchall()
-        expenseCategory, self.expenseCategoryText = self.createCategoryWidget(expenseCategoryValues)
-        cursor = self.data.fetchQuery('SELECT name FROM bank')
-        expenseBankValues = cursor.fetchall()
-        expenseBank, self.expenseBankText = self.createBankWidget(expenseBankValues)
-        expenseButton = self.createButton()
-        expenseButton.clicked.connect(self.expenseButtonClick)
-        # Set widget to expence tab layout
-        expenseLayout = QVBoxLayout()
-        expenseLayout.addWidget(self.expenseCalendar)
-        expenseLayout.addLayout(expenseItem)
-        expenseLayout.addLayout(expenseMoney)
-        expenseLayout.addLayout(expenseCategory)
-        expenseLayout.addLayout(expenseBank)
-        expenseLayout.addWidget(expenseButton)
-        # Create widget for income tab
-        self.incomeCalendar = self.createCalendarWidget()
-        incomeItem, self.incomeItemText  = self.createItemWidget()
-        incomeMoney, self.incomeMoneyText = self.createMoneyWidget()
-        cursor = self.data.fetchQuery('SELECT name FROM category WHERE type = "収入"')
-        incomeCategoryValues = cursor.fetchall()
-        incomeCategory, self.incomeCategoryText = self.createCategoryWidget(incomeCategoryValues)
-        cursor = self.data.fetchQuery('SELECT name FROM bank')
-        incomeBankValues = cursor.fetchall()
-        incomeBank, self.incomeBankText = self.createBankWidget(incomeBankValues)
-        incomeButton = self.createButton()
-        incomeButton.clicked.connect(self.incomeButtonClick)
-        # Set widget to income layout
-        incomeLayout=QVBoxLayout()
-        incomeLayout.addWidget(self.incomeCalendar)
-        incomeLayout.addLayout(incomeItem)
-        incomeLayout.addLayout(incomeMoney)
-        incomeLayout.addLayout(incomeCategory)
-        incomeLayout.addLayout(incomeBank)
-        incomeLayout.addWidget(incomeButton)
+        self.inputTabLayout = QVBoxLayout()
+        expenceLayout = self.createInputWidget('支出')
+        inputLayout = self.createInputWidget('収入')
         # Set tab
         tabs = QTabWidget()
-        tabs.resize(200,100)
         # Add layout to expense tab
         expense_tab = QWidget()
-        expense_tab.setLayout(expenseLayout)
+        expense_tab.setLayout(expenceLayout)
         # Add layout to income tab
         income_tab = QWidget()
-        income_tab.setLayout(incomeLayout)
+        income_tab.setLayout(inputLayout)
         #Add tab to UI
         tabs.addTab(expense_tab,'支出')
         tabs.addTab(income_tab,'収入')
-        self.inputLayout.addWidget(tabs)
+        self.inputTabLayout.addWidget(tabs)
+
+    def createInputWidget(self, balance):
+        calendar = self.createCalendarWidget()
+        item, itemText = self.createItemWidget()
+        money, moneyText = self.createMoneyWidget()
+        # Set value for the combobox from category database
+        cursor = self.data.fetchQueryValue('SELECT name FROM category WHERE type = ?', (balance,))
+        categoryValues = cursor.fetchall()
+        category, categoryText = self.createCategoryWidget(categoryValues)
+        # Set value for the combobox from bank database
+        cursor = self.data.fetchQuery('SELECT name FROM bank')
+        bankValues = cursor.fetchall()
+        bank, bankText = self.createBankWidget(bankValues)
+        inputButton = self.createInputButton()
+        inputButton.clicked.connect(lambda: self.inputButtonClicked(calendar, itemText, moneyText, categoryText, bankText, balance))
+        # Set widget to expence tab layout
+        inputLayout = QVBoxLayout()
+        inputLayout.addWidget(calendar)
+        inputLayout.addLayout(item)
+        inputLayout.addLayout(money)
+        inputLayout.addLayout(category)
+        inputLayout.addLayout(bank)
+        inputLayout.addWidget(inputButton)
+
+        return inputLayout
 
     def createCalendarWidget(self):
         # Set calendar view setting 
@@ -223,65 +223,36 @@ class TabWidget(QWidget):
 
         return bankBox, bankCombo
 
-    def createButton(self):
+    def createInputButton(self):
         record_button = QPushButton('記録')
 
         return record_button
-    
-    def expenseButtonClick(self):
+
+    def inputButtonClicked(self, Calendar, itemText, moneyText, categoryText, bankText, balance):
         # Get data from calendar
-        calendar = self.expenseCalendar.selectedDate().toString('yyyy-MM-dd')
-        # Get item name from textbox
-        item = self.expenseItemText.text()
+        calendar = Calendar.selectedDate().toString('yyyy-MM-dd')
+         # Get item name from textbox
+        item = itemText.text()
         # Get amount of money from textbox
-        if(self.expenseMoneyText.text()):
-            money = int(self.expenseMoneyText.text())
+        if(moneyText.text()):
+            money = int(moneyText.text())
         else:
             money = 0.00
         # Get category name from textbox and find the ID for the name throgh category database 
-        category_name = self.expenseCategoryText.currentText()
+        category_name = categoryText.currentText()
         cursor = self.data.exeQuery('SELECT id FROM category WHERE name = ?', (category_name,))
         category_id = cursor.fetchone()
         # Get bank name from textbox and find the ID for the name throgh bank database 
-        bank_name = self.expenseBankText.currentText()
+        bank_name = bankText.currentText()
         cursor = self.data.exeQuery('SELECT id FROM bank WHERE name = ?', (bank_name,))
         bank_id = cursor.fetchone()
         # Set expense as a value for balance
-        balance = '支出'
+        balance_name = balance
         # Insert data into database
-        self.data.exeQuery('INSERT INTO report(date,description,amount,category_id,bank_id,balance) VALUES(?,?,?,?,?,?)', (calendar,item,money,str(category_id[0]),str(bank_id[0]),balance))
-        self.createLabel()
+        self.data.exeQuery('INSERT INTO report(date,description,amount,category_id,bank_id,balance) VALUES(?,?,?,?,?,?)', (calendar, item, money, str(category_id[0]), str(bank_id[0]), balance_name))
         # Clear out data from text box
-        self.expenseItemText.clear()
-        self.expenseMoneyText.clear()
-
-    def incomeButtonClick(self):
-        # Get selected date from calendar widget and convert value to string 
-        calendar = self.incomeCalendar.selectedDate().toString('yyyy-MM-dd')
-        # Get user input for item
-        item = self.incomeItemText.text()
-        # Get user input for amount if empty, set 0
-        if(self.incomeMoneyText.text()):
-            money = int(self.incomeMoneyText.text())
-        else:
-            money = 0.00
-        # Get category name from textbox and find the ID for the name throgh category database 
-        category_name = self.expenseCategoryText.currentText()
-        cursor = self.data.exeQuery('SELECT id FROM category WHERE name = ?', (category_name,))
-        category_id = cursor.fetchone()
-        # Get bank name from textbox and find the ID for the name throgh bank database 
-        bank_name = self.expenseBankText.currentText()
-        cursor = self.data.exeQuery('SELECT id FROM bank WHERE name = ?', (bank_name,))
-        bank_id = cursor.fetchone()
-        # Set income as a value for balance
-        balance = '収入'
-        # Insert data into database
-        self.data.exeQuery('INSERT INTO report(date,description,amount,category_id,bank_id,balance) VALUES(?,?,?,?,?,?)', (calendar,item,money,str(category_id[0]),str(bank_id[0]),balance))
-        self.createLabel()
-        # Clear text from textbox
-        self.expenseItemText.clear()
-        self.expenseMoneyText.clear()
-
+        itemText.clear()
+        moneyText.clear()
 
 
 
