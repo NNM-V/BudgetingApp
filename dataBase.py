@@ -64,7 +64,7 @@ class dataBase:
         # Save transaction to database
         self.conn.commit()
 
-    def exeQuery(self, query, values):
+    def exeQuery(self, query, values = None):
         cursor = self.conn.cursor()
         # Execute query
         cursor.execute(query,values)
@@ -72,6 +72,11 @@ class dataBase:
         self.conn.commit()
         return cursor
     
+    def lastRow(self, query):
+        cursor = self.conn.cursor()
+        cursor.execute(query)
+        return cursor.lastrowid
+        
     def fetchQueryValue(self, query, values):
         cursor = self.conn.cursor()
         # Execute query
