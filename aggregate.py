@@ -1,38 +1,37 @@
-import pandas as pd 
-import sqlite3
-import datetime
-from dataBase import dataBase
+import pandas as pd
+from database import DataBase
+
 
 class AggregateData:
-    def setData(self):
-        data = dataBase()
+    def set_data(self):
+        data = DataBase()
         conn = data.conn
 
         df = pd.read_sql('SELECT * FROM report', conn)
         df_date = df.copy()
-        df_date['date'] = pd.to_datetime(df_date['date'],format='mixed')
+        df_date['date'] = pd.to_datetime(df_date['date'], format='mixed')
         df_date = df_date.sort_values('date')
-        df_date.set_index('date', inplace = True)
+        df_date.set_index('date', inplace=True)
 
         data.close()
 
         return df_date
 
-    def incomeSum(self,current_month):
-        data = self.setData()
+    def income_sum(self, current_month):
+        data = self.set_data()
         data = data[data['balance'] == '収入']
-        incomeSum = data[data.index.month == current_month]['amount'].sum()
+        income_sum = data[data.index.month == current_month]['amount'].sum()
 
-        return incomeSum
+        return income_sum
 
-    def expenseSum(self,current_month):
-        data = self.setData()
+    def expense_sum(self, current_month):
+        data = self.set_data()
         data = data[data['balance'] == '支出']
-        expenseSum = data[data.index.month == current_month]['amount'].sum()
-        
-        return expenseSum
+        expense_sum = data[data.index.month == current_month]['amount'].sum()
 
-    def Difference(self, income, expense):
-        diff = income - expense   
-        
+        return expense_sum
+
+    def difference(self, income, expense):
+        diff = income - expense
+
         return diff

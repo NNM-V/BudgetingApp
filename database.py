@@ -1,12 +1,13 @@
 import sqlite3
 
-class dataBase:
-    def __init__(self):
-        self.dbname = 'database.db'
-        self.conn = sqlite3.connect(self.dbname)
-        self.setUp()
 
-    def setUp(self):
+class DataBase:
+    def __init__(self):
+        self.db_name = 'database.db'
+        self.conn = sqlite3.connect(self.db_name)
+        self.setup()
+
+    def setup(self):
         cursor = self.conn.cursor()
         # Create category table if not exists
         cursor.execute('''
@@ -17,20 +18,22 @@ class dataBase:
             )
         ''')
         # Insert initial data once when table is created
-        categoryCount = cursor.execute('SELECT COUNT(*) FROM category').fetchone()[0]
-        if categoryCount == 0:
+        category_count = cursor.execute(
+            'SELECT COUNT(*) FROM category'
+        ).fetchone()[0]
+        if category_count == 0:
             cursor.executemany(
                 'INSERT INTO category (name, type) VALUES (?,?)',
                 [
-                    ("食費","支出",),
-                    ("生活費","支出",),
-                    ("住居費","支出",),
-                    ("医療費","支出",),
-                    ("給料","収入",),
-                    ("お小遣い","収入")
+                    ("食費", "支出",),
+                    ("生活費", "支出",),
+                    ("住居費", "支出",),
+                    ("医療費", "支出",),
+                    ("給料", "収入",),
+                    ("お小遣い", "収入")
                 ]
             )
-        # Create bank table if not exists    
+        # Create bank table if not exists
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS bank (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,8 +41,8 @@ class dataBase:
             )
         ''')
         # Insert initial data once when table is created
-        bankCount = cursor.execute('SELECT COUNT(*) FROM bank').fetchone()[0]
-        if bankCount == 0:
+        bank_count = cursor.execute('SELECT COUNT(*) FROM bank').fetchone()[0]
+        if bank_count == 0:
             cursor.executemany(
                 'INSERT INTO bank (name) VALUES (?)',
                 [
@@ -47,7 +50,7 @@ class dataBase:
                     ("財布",)
                 ]
             )
-        #Create report table if not exists
+        # Create report table if not exists
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS report (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -64,29 +67,33 @@ class dataBase:
         # Save transaction to database
         self.conn.commit()
 
-    def exeQuery(self, query, values = None):
+    def exe_query(self, query, values=None):
         cursor = self.conn.cursor()
         # Execute query
-        cursor.execute(query,values)
+        cursor.execute(query, values)
         # Save transaction to database
         self.conn.commit()
+
         return cursor
-    
-    def lastRow(self, query):
+
+    def last_row(self, query):
         cursor = self.conn.cursor()
         cursor.execute(query)
+
         return cursor.lastrowid
-        
+
     def fetchQueryValue(self, query, values):
         cursor = self.conn.cursor()
         # Execute query
         cursor.execute(query, values)
+
         return cursor
 
     def fetchQuery(self, query):
         cursor = self.conn.cursor()
         # Execute query
         cursor.execute(query)
+
         return cursor
 
     def close(self):
