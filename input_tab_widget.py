@@ -230,7 +230,6 @@ class InputTabWidget(QWidget):
         subwin = InputSubWindow(balance)
         if subwin.exec() == QDialog.DialogCode.Accepted:
             res = subwin.result_text
-            print(res)
             return res
         else:
             return None
@@ -240,20 +239,13 @@ class InputTabWidget(QWidget):
         if category_name is not None:    
             self.data.exe_query(
             'INSERT INTO category(name, type) VALUES(?,?)', (
-                input_text, self.balance
+                category_name, balance
             )
         )
-        cursor_last_row = self.data.fetchQuery(
-            'SELECT id FROM category'
-        )
-        last_row_id = cursor_last_row.lastrowid
-        cursor = self.data.fetchQuery(
-            'SELECT name FROM category WHERE id = ?', (last_row_id,)
-        )
         if balance == '支出':
-            self.combo_out_text.addItem(str(category_name[0]))
+            self.combo_out_text.addItem(category_name)
         elif balance == '収入':
-            self.combo_in_text.addItem(str(category_name[0]))
+            self.combo_in_text.addItem(category_name)
         else:
             return
 
@@ -261,16 +253,9 @@ class InputTabWidget(QWidget):
         bank_name = self.subwin_result()
         if bank_name is not None:
             self.data.exe_query(
-                'INSERT INTO bank(name) VALUES(?)', (bank_name)
+                'INSERT INTO bank(name) VALUES(?)', (bank_name,)
             )
-            cursor_last_row = self.data.fetchQuery(
-                'SELECT id FROM bank'
-            )
-            last_row_id = cursor_last_row.lastrowid
-            cursor = self.data.fetchQuery(
-                'SELECT name FROM bank WHERE id = ?', (last_row_id,)
-            )
-            self.bank_out_text.addItem(str(bank_name[0]))
-            self.bank_in_text.addItem(str(bank_name[0]))
+            self.bank_out_text.addItem(bank_name)
+            self.bank_in_text.addItem(bank_name)
         else:
             return

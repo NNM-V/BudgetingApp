@@ -10,7 +10,7 @@ class InputSubWindow(QDialog):
         self.data = DataBase()
         subwin = self.create_subwin_tab()
         self.setLayout(subwin)
-
+    
     def create_subwin_tab(self):
         subwin_layout = QVBoxLayout()
         # Set label
@@ -36,27 +36,12 @@ class InputSubWindow(QDialog):
         if s:
             self.add_item_button.setEnabled(True)
 
-    def add_button_clicked(self):
-        input_text = self.add_item_input.text()
-        print(input_text)
-        self.data.exe_query(
-            'INSERT INTO category(name, type) VALUES(?,?)', (
-                input_text, self.balance
-            )
-        )
-        cursor_last_row = self.data.fetchQuery(
-            'SELECT id FROM category'
-         )
-        last_row_id = cursor_last_row.lastrowid
-        cursor = self.data.fetchQuery(
-            'SELECT name FROM category WHERE id = ?', (last_row_id,)
-        )
-        self._res = cursor.fetchone()
+    def add_button_clicked(self, balance):
+        self._res = self.add_item_input.text()
         print(self._res)
         self.accept()
-        
+
     @property
     def result_text(self):
 
         return self._res
-
