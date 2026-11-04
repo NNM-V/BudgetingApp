@@ -68,31 +68,38 @@ class DataBase:
         self.conn.commit()
 
     def exe_query(self, query, values=None):
-        cursor = self.conn.cursor()
-        # Execute query
-        cursor.execute(query, values)
-        # Save transaction to database
-        self.conn.commit()
+        # Automatically close database when done
+        with sqlite3.connect(self.db_name) as conn:
+            cursor = self.conn.cursor()
+            # Execute query
+            try:
+                if values is not None:
+                    cursor.execute(query, values)
+                    self.conn.commit()
+                else:
+                    cursor.execute(query)
+                    self.conn.commit()
+            except sqlite3.Error as e:
+                print(f"An error occured: {e}")
+                self.conn.rollback()
 
         return cursor
 
-    def last_row(self, query):
-        cursor = self.conn.cursor()
-        cursor.execute(query)
-
-        return cursor.lastrowid
-
-    def fetchQueryValue(self, query, values):
-        cursor = self.conn.cursor()
-        # Execute query
-        cursor.execute(query, values)
-
-        return cursor
-
-    def fetchQuery(self, query):
-        cursor = self.conn.cursor()
-        # Execute query
-        cursor.execute(query)
+    def fetchQuery(self, query, values=None, balance=None):
+        # Automatically close database when done
+        with sqlite3.connect(self.db_name) as conn:
+            cursor = self.conn.cursor()
+            # Execute query
+            try:
+                if values is not None:
+                    cursor.execute(query, values)
+                elif balance is not None:
+                    cursor.execute(query, values, balance)
+                else:
+                    cursor.execute(query)
+            except sqlite3.Error as e:
+                print(f"An error occured: {e}")
+                self.conn.rollback()
 
         return cursor
 

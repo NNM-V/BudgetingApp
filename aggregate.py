@@ -9,7 +9,7 @@ class AggregateData:
 
         df = pd.read_sql('SELECT * FROM report', conn)
         df_date = df.copy()
-        df_date['date'] = pd.to_datetime(df_date['date'], format='mixed')
+        df_date['date'] = pd.to_datetime(df_date['date'], format='%Y-%m-%d')
         df_date = df_date.sort_values('date')
         df_date.set_index('date', inplace=True)
 
@@ -17,19 +17,16 @@ class AggregateData:
 
         return df_date
 
-    def income_sum(self, current_month):
+    def monthly_sum(self, year_month, balance_text):
+        year = year_month.year
+        month = year_month.month
+
         data = self.set_data()
-        data = data[data['balance'] == '収入']
-        income_sum = data[data.index.month == current_month]['amount'].sum()
+        data = data[data['balance'] == balance_text]
+        data = data[data.index.year == year]
+        sum_data = data[data.index.month == month]['amount'].sum()
 
-        return income_sum
-
-    def expense_sum(self, current_month):
-        data = self.set_data()
-        data = data[data['balance'] == '支出']
-        expense_sum = data[data.index.month == current_month]['amount'].sum()
-
-        return expense_sum
+        return sum_data
 
     def difference(self, income, expense):
         diff = income - expense
