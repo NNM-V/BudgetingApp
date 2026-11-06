@@ -69,7 +69,7 @@ class DataBase:
 
     def exe_query(self, query, values=None):
         # Automatically close database when done
-        with sqlite3.connect(self.db_name) as conn:
+        with self.conn:
             cursor = self.conn.cursor()
             # Execute query
             try:
@@ -87,7 +87,7 @@ class DataBase:
 
     def fetchQuery(self, query, values=None, balance=None):
         # Automatically close database when done
-        with sqlite3.connect(self.db_name) as conn:
+        with self.conn:
             cursor = self.conn.cursor()
             # Execute query
             try:

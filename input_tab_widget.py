@@ -1,9 +1,10 @@
-from PyQt6.QtWidgets import *
-from PyQt6.QtCore import *
-from PyQt6.QtGui import*
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import*
 from input_subwin import InputSubWindow
 from my_proxystyle import MyProxyStyle
 from database import DataBase
+from aggregate import AggregateData
 
 
 class InputTabWidget(QWidget):
@@ -90,7 +91,7 @@ class InputTabWidget(QWidget):
         calendar = QCalendarWidget()
         calendar.setFirstDayOfWeek(Qt.DayOfWeek(1))
         calendar.setGridVisible(True)
-        
+
         return calendar
 
     def create_item_widget(self):
@@ -191,7 +192,7 @@ class InputTabWidget(QWidget):
     def input_button_clicked(
             self, calendar, item_text, money_text,
             category_text, bank_text, balance_text
-        ):
+    ):
         # Get data from calendar
         date = calendar.selectedDate().toString('yyyy-MM-dd')
         # Get item name from textbox
@@ -236,18 +237,20 @@ class InputTabWidget(QWidget):
 
     def category_button_clicked(self, balance):
         category_name = self.subwin_result(balance)
-        if category_name is not None:    
+        if category_name is not None:
             self.data.exe_query(
-            'INSERT INTO category(name, type) VALUES(?,?)', (
-                category_name, balance
+                'INSERT INTO category(name, type) VALUES(?,?)', (
+                    category_name, balance
+                )
             )
-        )
         if balance == '支出':
             self.combo_out_text.addItem(category_name)
         elif balance == '収入':
             self.combo_in_text.addItem(category_name)
         else:
             return
+        aggregate_num = AggregateData()
+        aggregate_num.update_data()
 
     def bank_button_clicked(self):
         bank_name = self.subwin_result()

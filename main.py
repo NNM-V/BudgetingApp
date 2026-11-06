@@ -1,6 +1,5 @@
 import sys
-from PyQt6.QtWidgets import *
-from PyQt6.QtCore import *
+from PySide6.QtWidgets import QApplication, QMainWindow
 from database import DataBase
 from tab_widget import TabWidget
 

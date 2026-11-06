@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import *
+from PySide6.QtWidgets import *
 from database import DataBase
 
 
@@ -10,7 +10,7 @@ class InputSubWindow(QDialog):
         self.data = DataBase()
         subwin = self.create_subwin_tab()
         self.setLayout(subwin)
-    
+
     def create_subwin_tab(self):
         subwin_layout = QVBoxLayout()
         # Set label
@@ -38,7 +38,6 @@ class InputSubWindow(QDialog):
 
     def add_button_clicked(self, balance):
         self._res = self.add_item_input.text()
-        print(self._res)
         self.accept()
 
     @property
