@@ -1,6 +1,5 @@
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow
-from database import DataBase
 from tab_widget import TabWidget
 
 
@@ -16,8 +15,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.main_tabs)
         self.show()
 
-        data = DataBase()
-        data.close()
 
 if __name__ == '__main__':
     # Start app

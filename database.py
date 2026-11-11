@@ -85,7 +85,7 @@ class DataBase:
 
         return cursor
 
-    def fetchQuery(self, query, values=None, balance=None):
+    def fetch_query(self, query, values=None, balance=None):
         # Automatically close database when done
         with self.conn:
             cursor = self.conn.cursor()

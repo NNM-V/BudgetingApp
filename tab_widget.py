@@ -1,9 +1,6 @@
 from PySide6.QtWidgets import QWidget, QTabWidget, QVBoxLayout
-from PySide6.QtCore import *
-from PySide6.QtGui import *
 from summary_tab_widget import SummaryTabWidget
 from input_tab_widget import InputTabWidget
-import datetime
 
 
 class TabWidget(QWidget):
@@ -25,8 +22,9 @@ class TabWidget(QWidget):
         self.setLayout(self.tab_layout)
 
     def summary_tab_clicked(self):
-        today = datetime.date.today()
         current_tab = self.tabs.currentIndex()
+        # Update data when summary tab is clicked
         if current_tab == 0:
-            self.summary_tab_widget.year_month_label(today)
-            self.summary_tab_widget.balance_label(today)
+            self.summary_tab_widget.year_month_label()
+            self.summary_tab_widget.balance_label()
+            self.summary_tab_widget.set_chart()

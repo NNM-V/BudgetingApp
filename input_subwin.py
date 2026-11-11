@@ -1,4 +1,7 @@
-from PySide6.QtWidgets import *
+from PySide6.QtWidgets import (
+    QVBoxLayout, QLabel, QLineEdit,
+    QPushButton, QDialog
+)
 from database import DataBase
 
 
@@ -37,10 +40,12 @@ class InputSubWindow(QDialog):
             self.add_item_button.setEnabled(True)
 
     def add_button_clicked(self, balance):
+        # Get input from QLineEdit
         self._res = self.add_item_input.text()
+        # Accept dialog to close
         self.accept()
 
     @property
     def result_text(self):
-
+        # Return text
         return self._res

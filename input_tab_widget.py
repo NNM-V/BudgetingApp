@@ -1,10 +1,14 @@
-from PySide6.QtWidgets import *
-from PySide6.QtCore import *
-from PySide6.QtGui import*
+from PySide6.QtWidgets import (
+    QWidget, QTabWidget, QVBoxLayout,
+    QHBoxLayout, QLabel, QLineEdit,
+    QCalendarWidget, QComboBox, QPushButton,
+    QDialog
+)
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QDoubleValidator
 from input_subwin import InputSubWindow
 from my_proxystyle import MyProxyStyle
 from database import DataBase
-from aggregate import AggregateData
 
 
 class InputTabWidget(QWidget):
@@ -44,7 +48,7 @@ class InputTabWidget(QWidget):
         # Get money input widget and variable for text
         money_input, money_text = self.create_money_widget()
         # Set value for the combobox from category database
-        cursor = self.data.fetchQuery(
+        cursor = self.data.fetch_query(
             'SELECT name FROM category WHERE type = ?', (balance_text,)
         )
         category_values = cursor.fetchall()
@@ -58,7 +62,7 @@ class InputTabWidget(QWidget):
         elif balance_text == '収入':
             self.combo_in_text = category_text
         # Set value for the combobox from bank database
-        cursor = self.data.fetchQuery('SELECT name FROM bank')
+        cursor = self.data.fetch_query('SELECT name FROM bank')
         bank_values = cursor.fetchall()
         # Get bank input widget and variable for text
         bank_input, bank_text = self.create_bank_widget(bank_values)
@@ -204,13 +208,15 @@ class InputTabWidget(QWidget):
             money = 0.00
         # Get category name from textbox and find the ID throgh database
         category = category_text.currentText()
-        cursor = self.data.fetchQuery(
-            'SELECT id FROM category WHERE name = ? AND type = ?', (category, balance_text)
+        cursor = self.data.fetch_query(
+            'SELECT id FROM category WHERE name = ? AND type = ?', (
+                category, balance_text
+            )
         )
         category_id = cursor.fetchone()
         # Get bank name from textbox and find the ID throgh database
         bank = bank_text.currentText()
-        cursor = self.data.fetchQuery(
+        cursor = self.data.fetch_query(
             'SELECT id FROM bank WHERE name = ?', (bank,)
         )
         bank_id = cursor.fetchone()
@@ -218,7 +224,7 @@ class InputTabWidget(QWidget):
         balance = balance_text
         # Insert data into database
         self.data.exe_query(
-            'INSERT INTO report(date, description, amount, category_id, bank_id, balance) VALUES(?,?,?,?,?,?)', (
+            'INSERT INTO report (date, description, amount, category_id, bank_id, balance) VALUES(?,?,?,?,?,?)', (
                 date, item, money, str(category_id[0]),
                 str(bank_id[0]), balance
             )
@@ -229,6 +235,7 @@ class InputTabWidget(QWidget):
 
     def subwin_result(self, balance=None):
         subwin = InputSubWindow(balance)
+        # Return input data if QDialog is accepted to close
         if subwin.exec() == QDialog.DialogCode.Accepted:
             res = subwin.result_text
             return res
@@ -237,23 +244,23 @@ class InputTabWidget(QWidget):
 
     def category_button_clicked(self, balance):
         category_name = self.subwin_result(balance)
+        # Set input to combo box if input exists
         if category_name is not None:
             self.data.exe_query(
                 'INSERT INTO category(name, type) VALUES(?,?)', (
                     category_name, balance
                 )
             )
-        if balance == '支出':
-            self.combo_out_text.addItem(category_name)
-        elif balance == '収入':
-            self.combo_in_text.addItem(category_name)
+            if balance == '支出':
+                self.combo_out_text.addItem(category_name)
+            elif balance == '収入':
+                self.combo_in_text.addItem(category_name)
         else:
             return
-        aggregate_num = AggregateData()
-        aggregate_num.update_data()
 
     def bank_button_clicked(self):
         bank_name = self.subwin_result()
+        # Set input to combo box if input exists
         if bank_name is not None:
             self.data.exe_query(
                 'INSERT INTO bank(name) VALUES(?)', (bank_name,)

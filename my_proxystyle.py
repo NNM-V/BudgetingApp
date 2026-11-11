@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import *
+from PySide6.QtWidgets import QStyle, QProxyStyle
 
 
 class MyProxyStyle(QProxyStyle):
@@ -7,4 +7,3 @@ class MyProxyStyle(QProxyStyle):
             return 0
 
         return super().styleHint(hint, option, widget, return_data)
-
