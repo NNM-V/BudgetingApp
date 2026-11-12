@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 from dateutil.relativedelta import relativedelta
 from aggregate import AggregateData
+from database import DataBase
 from piechart import PieChart
 from summary_subwin import SummarySubWindow
 
@@ -15,6 +16,7 @@ class SummaryTabWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.current_date = datetime.date.today()
+        self.data = DataBase()
         self.pie_chart = PieChart()
         self.aggregate_num = AggregateData()
         summary_tab = self.create_summary_tab()
@@ -78,7 +80,7 @@ class SummaryTabWidget(QWidget):
         self.balance_text.setAlignment(Qt.AlignmentFlag.AlignRight)
         budget_label = QLabel('予算:')
         budget_label.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.budget_text = QLabel(f'{100000000.0}')
+        self.budget_text = QLabel()
         self.budget_text.setFixedWidth(80)
         self.budget_text.setAlignment(Qt.AlignmentFlag.AlignRight)
         # Set widget to layout
@@ -114,6 +116,8 @@ class SummaryTabWidget(QWidget):
         income_data = self.aggregate_num.monthly_sum(self.current_date, '収入')
         expense_data = self.aggregate_num.monthly_sum(self.current_date, '支出')
         balance_data = self.aggregate_num.difference(income_data, expense_data)
+        budget_data = self.aggregate_num.monthly_budget_sum(self.current_date.year, self.current_date.month)
+        print(budget_data)
         # Set aggregated data to UI
         self.income_text.setText(f'{income_data}')
         self.expense_text.setText(f'{expense_data}')
@@ -123,6 +127,14 @@ class SummaryTabWidget(QWidget):
             self.balance_text.setText(f'+ {balance_data}')
         else:
             self.balance_text.setText(f'{balance_data}')
+        # Set default number to lineedit if budget table is empty
+        year_month = self.current_date.strftime('%Y-%m')
+        budget_count = self.data.fetch_query('SELECT COUNT(*) FROM budget WHERE year_month=?', (year_month,)).fetchone()[0]
+        if budget_count == 0:
+            self.budget_text.setText(f'{0}')
+        else:
+            # Set data to lineedit if budget table exists
+            self.budget_text.setText(f'{budget_data}')
 
     def prev_button_clicked(self):
         # Replace current day to first day of the month
@@ -166,22 +178,19 @@ class SummaryTabWidget(QWidget):
         setting_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
 
         return setting_layout
-    '''
+
     def subwin_result(self):
-        subwin = SummarySubWindow()
+        subwin = SummarySubWindow(self.current_date)
         # Return input data if QDialog is accepted to close
-        if subwin.exec() == QDialog.DialogCode.Accepted():
+        if subwin.exec() == QDialog.DialogCode.Accepted:
             res = subwin.result_text
             return res
         else:
             return None
-    '''
+ 
     def setting_button_clicked(self):
-        year_month_str = self.current_date.strftime('%Y-%m')
-        subwin = SummarySubWindow(year_month_str)
-        # Return input data if QDialog is accepted to close
-        if subwin.exec() == QDialog.DialogCode.Accepted():
-            res = subwin.result_text
-            return res
+        budget = self.subwin_result()
+        if budget is not None:
+            self.budget_text.setText()
         else:
-            return None
+            return

@@ -57,7 +57,7 @@ class DataBase:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 year_month TEXT NOT NULL,
                 category_id INTEGER NOT NULL,
-                amount REAL,
+                amount INTEGER,
                 UNIQUE(year_month, category_id),
                 FOREIGN KEY (category_id) REFERENCES category(id)
             )

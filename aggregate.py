@@ -30,8 +30,8 @@ class AggregateData:
 
     def monthly_category_sum(self, year_month, balance_text):
         # Set dataframe from report table and category table
-        data = self.set_data('SELECT report.date, report.amount, report.balance, category.name FROM report JOIN category ON report.category_id = category.id'
-           
+        data = self.set_data(
+            'SELECT report.date, report.amount, report.balance, category.name FROM report JOIN category ON report.category_id = category.id'
         )
         # Filter dataframe from date and balance category
         data = self.filter_data(data, year_month, balance_text)
@@ -46,7 +46,7 @@ class AggregateData:
         
         return category_dict
 
-    def filter_data(self, data, year_month, balance_text):
+    def filter_data(self, data, year_month, balance_text=None):
         # Set datetime data format
         data['date'] = pd.to_datetime(data['date'], format='%Y-%m-%d')
         # Sort data by date
@@ -59,6 +59,19 @@ class AggregateData:
         data = data[data.index.month == year_month.month]
 
         return data
+
+    def monthly_budget_sum(self, year, month):
+        # Set dataframe from report table
+        data = self.set_data('SELECT * FROM budget')
+        # Set datetime data format
+        data['year_month'] = pd.to_datetime(data['year_month'], format='%Y-%m')
+        data.set_index('year_month', inplace=True)
+        # Filter data by year and month
+        data = data[data.index.year == year]
+        data = data[data.index.month == month]
+        sum_data = data['amount'].sum()
+        
+        return sum_data
 
     def difference(self, income, expense):
         # Get difference between income and expence
