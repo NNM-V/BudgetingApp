@@ -30,8 +30,8 @@ class AggregateData:
 
     def monthly_category_sum(self, year_month, balance_text):
         # Set dataframe from report table and category table
-        data = self.set_data(
-           'SELECT report.date, report.amount, report.balance, category.name FROM report JOIN category ON report.category_id = category.id'
+        data = self.set_data('SELECT report.date, report.amount, report.balance, category.name FROM report JOIN category ON report.category_id = category.id'
+           
         )
         # Filter dataframe from date and balance category
         data = self.filter_data(data, year_month, balance_text)
