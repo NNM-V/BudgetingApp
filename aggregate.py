@@ -42,9 +42,8 @@ class AggregateData:
         # Set default data if month has no data
         empty_dict = {}
         if category_dict == empty_dict:
-            category_dict = {'No data yet': 0}
-        for c, a in category_dict.items():
-            print(c, a)
+            category_dict = {'No data': 0}
+        
         return category_dict
 
     def filter_data(self, data, year_month, balance_text):

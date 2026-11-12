@@ -1,12 +1,14 @@
 import datetime
 from PySide6.QtWidgets import (
     QWidget, QHBoxLayout, QGridLayout,
-    QGroupBox, QLabel, QPushButton, QVBoxLayout,
+    QGroupBox, QLabel, QPushButton, 
+    QVBoxLayout, QDialog
 )
 from PySide6.QtCore import Qt
 from dateutil.relativedelta import relativedelta
 from aggregate import AggregateData
 from piechart import PieChart
+from summary_subwin import SummarySubWindow
 
 
 class SummaryTabWidget(QWidget):
@@ -24,16 +26,15 @@ class SummaryTabWidget(QWidget):
         return self.current_date
 
     def create_summary_tab(self):
-        # Call widget
-        year_month = self.create_year_month_widget()
-        monthly_balance = self.create_monthly_balance_widget()
-        piechart = self.create_graph_widget()
+        # Set Data to piechart
+        self.set_chart()
         # Add each widget to main layout
         summary_tab_layout = QVBoxLayout()
-        summary_tab_layout.addLayout(year_month)
-        summary_tab_layout.addWidget(monthly_balance)
-        summary_tab_layout.addLayout(piechart)
-        summary_tab_layout.setSpacing(30)
+        summary_tab_layout.addLayout(self.create_year_month_widget())
+        summary_tab_layout.addWidget(self.create_monthly_balance_widget())
+        summary_tab_layout.addWidget(self.pie_chart)
+        summary_tab_layout.addLayout(self.create_setting_widget())
+        summary_tab_layout.setSpacing(10)
 
         return summary_tab_layout
 
@@ -147,15 +148,6 @@ class SummaryTabWidget(QWidget):
         # Update data for pie chart
         self.set_chart()
 
-    def create_graph_widget(self):
-        # Set data for pie chart
-        self.set_chart()
-        # Set widget to layout
-        self.pie_chart_layout = QVBoxLayout()
-        self.pie_chart_layout.addWidget(self.pie_chart)
-
-        return self.pie_chart_layout
-
     def set_chart(self):
         # Get balance sum for each category
         category_dict = self.aggregate_num.monthly_category_sum(
@@ -163,3 +155,33 @@ class SummaryTabWidget(QWidget):
         )
         # Append dictionary data to pie graph
         self.pie_chart.append_data(category_dict)
+
+    def create_setting_widget(self):
+        # Set month label widget
+        setting_button = QPushButton('Setting')
+        setting_button.setFixedWidth(70)
+        setting_button.clicked.connect(self.setting_button_clicked)
+        setting_layout = QHBoxLayout()
+        setting_layout.addWidget(setting_button)
+        setting_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
+
+        return setting_layout
+    '''
+    def subwin_result(self):
+        subwin = SummarySubWindow()
+        # Return input data if QDialog is accepted to close
+        if subwin.exec() == QDialog.DialogCode.Accepted():
+            res = subwin.result_text
+            return res
+        else:
+            return None
+    '''
+    def setting_button_clicked(self):
+        year_month_str = self.current_date.strftime('%Y-%m')
+        subwin = SummarySubWindow(year_month_str)
+        # Return input data if QDialog is accepted to close
+        if subwin.exec() == QDialog.DialogCode.Accepted():
+            res = subwin.result_text
+            return res
+        else:
+            return None

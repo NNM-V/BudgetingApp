@@ -48,10 +48,9 @@ class InputTabWidget(QWidget):
         # Get money input widget and variable for text
         money_input, money_text = self.create_money_widget()
         # Set value for the combobox from category database
-        cursor = self.data.fetch_query(
+        category_values = self.data.fetch_query(
             'SELECT name FROM category WHERE type = ?', (balance_text,)
-        )
-        category_values = cursor.fetchall()
+        ).fetchall()
         # Get category input widget and variable for text
         category_input, category_text = self.create_category_widget(
             category_values, balance_text
@@ -62,8 +61,7 @@ class InputTabWidget(QWidget):
         elif balance_text == '収入':
             self.combo_in_text = category_text
         # Set value for the combobox from bank database
-        cursor = self.data.fetch_query('SELECT name FROM bank')
-        bank_values = cursor.fetchall()
+        bank_values = self.data.fetch_query('SELECT name FROM bank').fetchall()
         # Get bank input widget and variable for text
         bank_input, bank_text = self.create_bank_widget(bank_values)
         # Set variable for bank text from balance
@@ -208,18 +206,16 @@ class InputTabWidget(QWidget):
             money = 0.00
         # Get category name from textbox and find the ID throgh database
         category = category_text.currentText()
-        cursor = self.data.fetch_query(
+        category_id = self.data.fetch_query(
             'SELECT id FROM category WHERE name = ? AND type = ?', (
                 category, balance_text
             )
-        )
-        category_id = cursor.fetchone()
+        ).fetchone()
         # Get bank name from textbox and find the ID throgh database
         bank = bank_text.currentText()
-        cursor = self.data.fetch_query(
+        bank_id = self.data.fetch_query(
             'SELECT id FROM bank WHERE name = ?', (bank,)
-        )
-        bank_id = cursor.fetchone()
+        ).fetchone()
         # Set expense as a value for balance
         balance = balance_text
         # Insert data into database

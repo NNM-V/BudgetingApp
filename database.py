@@ -5,6 +5,7 @@ class DataBase:
     def __init__(self):
         self.db_name = 'database.db'
         self.conn = sqlite3.connect(self.db_name)
+        self.conn.execute("PRAGMA foreign_keys = ON;")
         self.setup()
 
     def setup(self):
@@ -50,6 +51,17 @@ class DataBase:
                     ("財布",)
                 ]
             )
+        # Create budget table if not exists
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS budget (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                year_month TEXT NOT NULL,
+                category_id INTEGER NOT NULL,
+                amount REAL,
+                UNIQUE(year_month, category_id),
+                FOREIGN KEY (category_id) REFERENCES category(id)
+            )
+        ''')
         # Create report table if not exists
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS report (
