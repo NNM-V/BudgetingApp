@@ -23,7 +23,9 @@ class AggregateData:
     def monthly_sum(self, year_month, balance_text):
         # Set dataframe from report table
         data = self.set_data('SELECT * FROM report')
+        # Filter dataframe from date and balance category
         data = self.filter_data(data, year_month, balance_text)
+        # Get the sum
         sum_data = data['amount'].sum()
 
         return sum_data
@@ -31,20 +33,15 @@ class AggregateData:
     def monthly_category_sum(self, year_month, balance_text):
         # Set dataframe from report table and category table
         data = self.set_data(
-            'SELECT report.date, report.amount, report.balance, category.name FROM report JOIN category ON report.category_id = category.id'
+            'SELECT report.date, report.amount, report.balance, category.name \
+                FROM report JOIN category ON report.category_id = category.id'
         )
         # Filter dataframe from date and balance category
         data = self.filter_data(data, year_month, balance_text)
         # Get the amount of sum for each category
-        category_data = data.groupby('name')['amount'].sum()
-        # Convert dataframe to dictionary
-        category_dict = category_data.to_dict()
-        # Set default data if month has no data
-        empty_dict = {}
-        if category_dict == empty_dict:
-            category_dict = {'No data': 0}
-        
-        return category_dict
+        sum_data = data.groupby('name')['amount'].sum()
+
+        return sum_data
 
     def filter_data(self, data, year_month, balance_text=None):
         # Set datetime data format
@@ -70,7 +67,7 @@ class AggregateData:
         data = data[data.index.year == year]
         data = data[data.index.month == month]
         sum_data = data['amount'].sum()
-        
+
         return sum_data
 
     def difference(self, income, expense):

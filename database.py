@@ -67,9 +67,9 @@ class DataBase:
             CREATE TABLE IF NOT EXISTS report (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 date TEXT,
+                category_id INTEGER,
                 description TEXT,
                 amount REAL,
-                category_id INTEGER,
                 bank_id  INTEGER,
                 balance TEXT,
                 FOREIGN KEY (category_id) REFERENCES category(id)

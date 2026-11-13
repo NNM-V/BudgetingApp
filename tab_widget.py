@@ -25,6 +25,6 @@ class TabWidget(QWidget):
         current_tab = self.tabs.currentIndex()
         # Update data when summary tab is clicked
         if current_tab == 0:
-            self.summary_tab_widget.year_month_label()
-            self.summary_tab_widget.balance_label()
+            self.summary_tab_widget.set_year_month_label()
+            self.summary_tab_widget.set_balance_label()
             self.summary_tab_widget.set_chart()
