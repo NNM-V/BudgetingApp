@@ -17,12 +17,11 @@ class InputTabWidget(QWidget):
         # Call database class
         self.data = DataBase()
         # Set layout to tab_widget class
-        input_tab = self.set_input_tab()
-        self.setLayout(input_tab)
+        self.setLayout(self.set_input_tab())
 
     def set_input_tab(self):
         # input main layout
-        input_tab_layout = QVBoxLayout()
+        tab_layout = QVBoxLayout()
         expence_layout = self.create_input_tab('支出')
         input_layout = self.create_input_tab('収入')
         # Set tab
@@ -36,54 +35,54 @@ class InputTabWidget(QWidget):
         # Create tab
         tabs.addTab(expense_tab, '支出')
         tabs.addTab(income_tab, '収入')
-        input_tab_layout.addWidget(tabs)
+        tab_layout.addWidget(tabs)
 
-        return input_tab_layout
+        return tab_layout
 
-    def create_input_tab(self, balance_text):
+    def create_input_tab(self, balance):
+        input_tab_layout = QVBoxLayout()
         # Get calendar widget
         date = self.create_calendar_widget()
         # Get item input widget and variable for text
-        item_input, item_text = self.create_item_widget()
+        item_layout, item_input = self.create_item_widget()
         # Get money input widget and variable for text
-        money_input, money_text = self.create_money_widget()
+        money_layout, money_input = self.create_money_widget()
         # Set value for the combobox from category database
-        category_values = self.data.fetch_query(
-            'SELECT name FROM category WHERE type = ?', (balance_text,)
+        category_names = self.data.fetch_query(
+            'SELECT name FROM category WHERE type = ?', (balance,)
         ).fetchall()
         # Get category input widget and variable for text
-        category_input, category_text = self.create_category_widget(
-            category_values, balance_text
+        category_layout, category_combo = self.create_category_widget(
+            category_names, balance
         )
         # Set variable for category text from balance
-        if balance_text == '支出':
-            self.combo_out_text = category_text
-        elif balance_text == '収入':
-            self.combo_in_text = category_text
+        if balance == '支出':
+            self.expence_category_combo = category_combo
+        elif balance == '収入':
+            self.income_categoty_combo = category_combo
         # Set value for the combobox from bank database
-        bank_values = self.data.fetch_query('SELECT name FROM bank').fetchall()
+        bank_names = self.data.fetch_query('SELECT name FROM bank').fetchall()
         # Get bank input widget and variable for text
-        bank_input, bank_text = self.create_bank_widget(bank_values)
+        bank_layout, bank_combo = self.create_bank_widget(bank_names)
         # Set variable for bank text from balance
-        if balance_text == '支出':
-            self.bank_out_text = bank_text
-        elif balance_text == '収入':
-            self.bank_in_text = bank_text
+        if balance == '支出':
+            self.expence_bank_combo = bank_combo
+        elif balance == '収入':
+            self.income_bank_combo = bank_combo
         # Get input button widget
         input_button = self.create_input_button()
         input_button.clicked.connect(
             lambda: self.input_button_clicked(
-                date, item_text, money_text,
-                category_text, bank_text, balance_text
+                date, item_input, money_input,
+                category_combo, bank_combo, balance
             )
         )
         # Add each widget to main layout
-        input_tab_layout = QVBoxLayout()
         input_tab_layout.addWidget(date)
-        input_tab_layout.addLayout(item_input)
-        input_tab_layout.addLayout(money_input)
-        input_tab_layout.addLayout(category_input)
-        input_tab_layout.addLayout(bank_input)
+        input_tab_layout.addLayout(item_layout)
+        input_tab_layout.addLayout(money_layout)
+        input_tab_layout.addLayout(category_layout)
+        input_tab_layout.addLayout(bank_layout)
         input_tab_layout.addWidget(input_button)
 
         return input_tab_layout
@@ -97,19 +96,20 @@ class InputTabWidget(QWidget):
         return calendar
 
     def create_item_widget(self):
+        item_layout = QHBoxLayout()
         # Create item widget
         item_label = QLabel('項目:')
         item_input = QLineEdit()
         item_input.setPlaceholderText('項目を入力')
         item_input.setFixedWidth(250)
         # Set widget to layout
-        item_box = QHBoxLayout()
-        item_box.addWidget(item_label)
-        item_box.addWidget(item_input, alignment=Qt.AlignmentFlag.AlignLeft)
+        item_layout.addWidget(item_label)
+        item_layout.addWidget(item_input, alignment=Qt.AlignmentFlag.AlignLeft)
 
-        return item_box, item_input
+        return item_layout, item_input
 
     def create_money_widget(self):
+        money_layout = QHBoxLayout()
         # Create money widget
         money_label = QLabel('金額:')
         money_input = QLineEdit()
@@ -118,13 +118,15 @@ class InputTabWidget(QWidget):
         money_input.setValidator(validator)
         money_input.setFixedWidth(250)
         # Set widget to layout
-        money_box = QHBoxLayout()
-        money_box.addWidget(money_label)
-        money_box.addWidget(money_input, alignment=Qt.AlignmentFlag.AlignLeft)
+        money_layout.addWidget(money_label)
+        money_layout.addWidget(
+            money_input, alignment=Qt.AlignmentFlag.AlignLeft
+        )
 
-        return money_box, money_input
+        return money_layout, money_input
 
     def create_category_widget(self, values, balance):
+        category_layout = QHBoxLayout()
         # Create category widget
         category_label = QLabel('カテゴリー :')
         category_combo = self.set_combobox(values)
@@ -135,20 +137,20 @@ class InputTabWidget(QWidget):
             lambda: self.category_button_clicked(balance)
         )
         # Set widget to layout
-        category_box = QHBoxLayout()
-        category_box.addWidget(
+        category_layout.addWidget(
             category_label, alignment=Qt.AlignmentFlag.AlignLeft
         )
-        category_box.addWidget(
+        category_layout.addWidget(
             category_combo, alignment=Qt.AlignmentFlag.AlignLeft
         )
-        category_box.addWidget(
+        category_layout.addWidget(
             category_button, alignment=Qt.AlignmentFlag.AlignLeft
         )
 
-        return category_box, category_combo
+        return category_layout, category_combo
 
     def create_bank_widget(self, values):
+        bank_layout = QHBoxLayout()
         # Set expense bank layout
         bank_label = QLabel('出入先:')
         bank_combo = QComboBox()
@@ -158,32 +160,33 @@ class InputTabWidget(QWidget):
         # Set process for when bank_button is clicked
         bank_button.clicked.connect(self.bank_button_clicked)
         # Set widget to layout
-        bank_box = QHBoxLayout()
-        bank_box.addWidget(bank_label, alignment=Qt.AlignmentFlag.AlignLeft)
-        bank_box.addWidget(bank_combo, alignment=Qt.AlignmentFlag.AlignLeft)
-        bank_box.addWidget(bank_button, alignment=Qt.AlignmentFlag.AlignLeft)
+        bank_layout.addWidget(bank_label, alignment=Qt.AlignmentFlag.AlignLeft)
+        bank_layout.addWidget(bank_combo, alignment=Qt.AlignmentFlag.AlignLeft)
+        bank_layout.addWidget(
+            bank_button, alignment=Qt.AlignmentFlag.AlignLeft
+        )
 
-        return bank_box, bank_combo
+        return bank_layout, bank_combo
 
     def set_combobox(self, values):
         # Create combobox
-        combo_box = QComboBox()
+        combo = QComboBox()
         # Set item in combo_box from values
         for value in values:
-            combo_box.addItem(str(value[0]))
-        combo_box.setFixedWidth(120)
+            combo.addItem(str(value[0]))
+        combo.setFixedWidth(120)
         # Set max number of item to show at once
-        combo_box.setMaxVisibleItems(6)
+        combo.setMaxVisibleItems(6)
         # Set scrollbar
-        combo_box.view().setVerticalScrollBarPolicy(
+        combo.view().setVerticalScrollBarPolicy(
             Qt.ScrollBarPolicy.ScrollBarAsNeeded
         )
         # setMaxVisibleItems is ignored on Mac style
         # Set SH_ComboBox_Popup false
         style = MyProxyStyle()
-        combo_box.setStyle(style)
+        combo.setStyle(style)
 
-        return combo_box
+        return combo
 
     def create_input_button(self):
         # Create record button
@@ -192,76 +195,75 @@ class InputTabWidget(QWidget):
         return record_button
 
     def input_button_clicked(
-            self, calendar, item_text, money_text,
-            category_text, bank_text, balance_text
+            self, calendar, item_input, money_input,
+            category_input, bank_input, balance
     ):
         # Get data from calendar
         date = calendar.selectedDate().toString('yyyy-MM-dd')
         # Get item name from textbox
-        item = item_text.text()
+        item = item_input.text()
         # Get amount of money from textbox
-        if money_text.text():
-            money = float(money_text.text())
+        if money_input.text():
+            money = float(money_input.text())
         else:
             money = 0.00
         # Get category name from textbox and find the ID throgh database
-        category = category_text.currentText()
+        category = category_input.currentText()
         category_id = self.data.fetch_query(
             'SELECT id FROM category WHERE name = ? AND type = ?', (
-                category, balance_text
+                category, balance
             )
         ).fetchone()
         # Get bank name from textbox and find the ID throgh database
-        bank = bank_text.currentText()
+        bank = bank_input.currentText()
         bank_id = self.data.fetch_query(
             'SELECT id FROM bank WHERE name = ?', (bank,)
         ).fetchone()
-        # Set expense as a value for balance
-        balance = balance_text
         # Insert data into database
         self.data.exe_query(
-            'INSERT INTO report (date, description, amount, category_id, bank_id, balance) VALUES(?,?,?,?,?,?)', (
-                date, item, money, str(category_id[0]),
-                str(bank_id[0]), balance
+            'INSERT INTO report (date, category_id, description, \
+            amount, bank_id, balance) VALUES(?,?,?,?,?,?)', (
+                date, str(category_id[0]), item,
+                money, str(bank_id[0]), balance
             )
         )
         # Clear out data from text box
-        item_text.clear()
-        money_text.clear()
+        item_input.clear()
+        money_input.clear()
 
     def subwin_result(self, balance=None):
         subwin = InputSubWindow(balance)
         # Return input data if QDialog is accepted to close
         if subwin.exec() == QDialog.DialogCode.Accepted:
-            res = subwin.result_text
+            res = subwin.set_result
             return res
         else:
             return None
 
     def category_button_clicked(self, balance):
-        category_name = self.subwin_result(balance)
+        category = self.subwin_result(balance)
         # Set input to combo box if input exists
-        if category_name is not None:
+        if category is not None:
             self.data.exe_query(
                 'INSERT INTO category(name, type) VALUES(?,?)', (
-                    category_name, balance
+                    category, balance
                 )
             )
             if balance == '支出':
-                self.combo_out_text.addItem(category_name)
+                self.expence_category_combo.addItem(category)
             elif balance == '収入':
-                self.combo_in_text.addItem(category_name)
+                self.income_categoty_combo.addItem(category)
         else:
             return
 
     def bank_button_clicked(self):
-        bank_name = self.subwin_result()
+        bank = self.subwin_result()
         # Set input to combo box if input exists
-        if bank_name is not None:
+        if bank is not None:
             self.data.exe_query(
-                'INSERT INTO bank(name) VALUES(?)', (bank_name,)
+                'INSERT INTO bank(name) VALUES(?)', (bank,)
             )
-            self.bank_out_text.addItem(bank_name)
-            self.bank_in_text.addItem(bank_name)
+            self.expence_bank_combo.addItem(bank)
+            self.income_bank_combo.addItem(bank)
         else:
             return
