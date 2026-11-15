@@ -11,8 +11,8 @@ class TabWidget(QWidget):
         self.input_tab_widget = InputTabWidget()
         # Add widget to tabs
         self.tabs = QTabWidget()
-        self.tabs.addTab(self.summary_tab_widget, 'サマリー')
-        self.tabs.addTab(self.input_tab_widget, '入力')
+        self.tabs.addTab(self.summary_tab_widget, 'Summary')
+        self.tabs.addTab(self.input_tab_widget, 'Input')
         # Set process for when summary tab is clicked
         self.tabs.currentChanged.connect(self.summary_tab_clicked)
         # Set tabs to tab_layout

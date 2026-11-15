@@ -63,22 +63,22 @@ class SummaryTabWidget(QWidget):
     def create_monthly_balance_widget(self):
         monthly_balance_layout = QGridLayout()
         # Set summary data widget
-        income_label = QLabel('収入:')
+        income_label = QLabel('Income:')
         income_label.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.income = QLabel()
         self.income.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.income.setFixedWidth(80)
-        expense_label = QLabel('支出:')
+        expense_label = QLabel('Expense:')
         expense_label.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.expense = QLabel()
         self.expense.setFixedWidth(80)
         self.expense.setAlignment(Qt.AlignmentFlag.AlignRight)
-        balance_label = QLabel('収支:')
+        balance_label = QLabel('Balance:')
         balance_label.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.balance = QLabel()
         self.balance.setFixedWidth(80)
         self.balance.setAlignment(Qt.AlignmentFlag.AlignRight)
-        budget_label = QLabel('予算:')
+        budget_label = QLabel('Budget:')
         budget_label.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.budget = QLabel()
         self.budget.setFixedWidth(80)
@@ -112,8 +112,8 @@ class SummaryTabWidget(QWidget):
 
     def set_balance_label(self):
         # Get aggregated data
-        income_sum = self.aggregate_num.monthly_sum(self.current_date, '収入')
-        expense_sum = self.aggregate_num.monthly_sum(self.current_date, '支出')
+        income_sum = self.aggregate_num.monthly_sum(self.current_date, 'income')
+        expense_sum = self.aggregate_num.monthly_sum(self.current_date, 'expense')
         balance_sum = self.aggregate_num.difference(income_sum, expense_sum)
         # Set aggregated data to UI
         self.income.setText(f'{income_sum}')
@@ -164,7 +164,7 @@ class SummaryTabWidget(QWidget):
     def set_chart(self):
         # Get balance sum for each category
         category_sum = self.aggregate_num.monthly_category_sum(
-            self.current_date, '支出'
+            self.current_date, 'expense'
         )
         # Convert dataframe to dictionary
         category_dict = category_sum.to_dict()

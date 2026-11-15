@@ -21,7 +21,7 @@ class InputSubWindow(QDialog):
         self.item_input.setPlaceholderText('type category')
         # Connect add_item_input to function
         self.item_input.textChanged.connect(self.text_changed)
-        self.add_button = QPushButton("追加")
+        self.add_button = QPushButton("Add")
         self.add_button.setEnabled(False)
         # Set process for when add_item_button is clicked
         self.add_button.clicked.connect(self.add_button_clicked)

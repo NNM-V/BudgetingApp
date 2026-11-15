@@ -22,19 +22,19 @@ class InputTabWidget(QWidget):
     def set_input_tab(self):
         # input main layout
         tab_layout = QVBoxLayout()
-        expence_layout = self.create_input_tab('支出')
-        input_layout = self.create_input_tab('収入')
+        expense_layout = self.create_input_tab('expense')
+        input_layout = self.create_input_tab('income')
         # Set tab
         tabs = QTabWidget()
         # Add layout to expense tab
         expense_tab = QWidget()
-        expense_tab.setLayout(expence_layout)
+        expense_tab.setLayout(expense_layout)
         # Add layout to income tab
         income_tab = QWidget()
         income_tab.setLayout(input_layout)
         # Create tab
-        tabs.addTab(expense_tab, '支出')
-        tabs.addTab(income_tab, '収入')
+        tabs.addTab(expense_tab, 'expense')
+        tabs.addTab(income_tab, 'income')
         tab_layout.addWidget(tabs)
 
         return tab_layout
@@ -56,18 +56,18 @@ class InputTabWidget(QWidget):
             category_names, balance
         )
         # Set variable for category text from balance
-        if balance == '支出':
-            self.expence_category_combo = category_combo
-        elif balance == '収入':
+        if balance == 'expense':
+            self.expense_category_combo = category_combo
+        elif balance == 'income':
             self.income_categoty_combo = category_combo
         # Set value for the combobox from bank database
         bank_names = self.data.fetch_query('SELECT name FROM bank').fetchall()
         # Get bank input widget and variable for text
         bank_layout, bank_combo = self.create_bank_widget(bank_names)
         # Set variable for bank text from balance
-        if balance == '支出':
-            self.expence_bank_combo = bank_combo
-        elif balance == '収入':
+        if balance == 'expense':
+            self.expense_bank_combo = bank_combo
+        elif balance == 'income':
             self.income_bank_combo = bank_combo
         # Get input button widget
         input_button = self.create_input_button()
@@ -98,9 +98,9 @@ class InputTabWidget(QWidget):
     def create_item_widget(self):
         item_layout = QHBoxLayout()
         # Create item widget
-        item_label = QLabel('項目:')
+        item_label = QLabel('Content:')
         item_input = QLineEdit()
-        item_input.setPlaceholderText('項目を入力')
+        item_input.setPlaceholderText('Input content')
         item_input.setFixedWidth(250)
         # Set widget to layout
         item_layout.addWidget(item_label)
@@ -111,7 +111,7 @@ class InputTabWidget(QWidget):
     def create_money_widget(self):
         money_layout = QHBoxLayout()
         # Create money widget
-        money_label = QLabel('金額:')
+        money_label = QLabel('Amount:')
         money_input = QLineEdit()
         # Set validation to check if input is a number
         validator = QDoubleValidator()
@@ -128,7 +128,7 @@ class InputTabWidget(QWidget):
     def create_category_widget(self, values, balance):
         category_layout = QHBoxLayout()
         # Create category widget
-        category_label = QLabel('カテゴリー :')
+        category_label = QLabel('Category:')
         category_combo = self.set_combobox(values)
         category_button = QPushButton("+")
         category_button.setFixedWidth(50)
@@ -152,7 +152,7 @@ class InputTabWidget(QWidget):
     def create_bank_widget(self, values):
         bank_layout = QHBoxLayout()
         # Set expense bank layout
-        bank_label = QLabel('出入先:')
+        bank_label = QLabel('Account:')
         bank_combo = QComboBox()
         bank_combo = self.set_combobox(values)
         bank_button = QPushButton('+')
@@ -190,7 +190,7 @@ class InputTabWidget(QWidget):
 
     def create_input_button(self):
         # Create record button
-        record_button = QPushButton('記録')
+        record_button = QPushButton('Record')
 
         return record_button
 
@@ -249,9 +249,9 @@ class InputTabWidget(QWidget):
                     category, balance
                 )
             )
-            if balance == '支出':
-                self.expence_category_combo.addItem(category)
-            elif balance == '収入':
+            if balance == 'expense':
+                self.expense_category_combo.addItem(category)
+            elif balance == 'income':
                 self.income_categoty_combo.addItem(category)
         else:
             return
@@ -263,7 +263,7 @@ class InputTabWidget(QWidget):
             self.data.exe_query(
                 'INSERT INTO bank(name) VALUES(?)', (bank,)
             )
-            self.expence_bank_combo.addItem(bank)
+            self.expense_bank_combo.addItem(bank)
             self.income_bank_combo.addItem(bank)
         else:
             return
