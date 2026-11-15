@@ -37,7 +37,7 @@ class SummarySubWindow(QDialog):
         item_label = QLabel('Set budget for this month:')
         # Get category names from category table and set to list
         category_name = self.database.fetch_query(
-            'SELECT name FROM category WHERE type = "支出"'
+            'SELECT name FROM category WHERE type = "expense"'
         )
         category_list = [name for name, in category_name.fetchall()]
         # Set widget dynamically based on data in the category table

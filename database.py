@@ -26,12 +26,12 @@ class DataBase:
             cursor.executemany(
                 'INSERT INTO category (name, type) VALUES (?,?)',
                 [
-                    ("食費", "支出",),
-                    ("生活費", "支出",),
-                    ("住居費", "支出",),
-                    ("医療費", "支出",),
-                    ("給料", "収入",),
-                    ("お小遣い", "収入")
+                    ("Groceries", "expense",),
+                    ("Household", "expense",),
+                    ("Housing", "expense",),
+                    ("medical", "expense",),
+                    ("salary", "income",),
+                    ("allowance", "income")
                 ]
             )
         # Create bank table if not exists
@@ -47,8 +47,8 @@ class DataBase:
             cursor.executemany(
                 'INSERT INTO bank (name) VALUES (?)',
                 [
-                    ("銀行",),
-                    ("財布",)
+                    ("Bank",),
+                    ("Wallet",)
                 ]
             )
         # Create budget table if not exists
