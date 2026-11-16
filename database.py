@@ -34,18 +34,18 @@ class DataBase:
                     ("allowance", "income")
                 ]
             )
-        # Create bank table if not exists
+        # Create account table if not exists
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS bank (
+            CREATE TABLE IF NOT EXISTS account (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL
             )
         ''')
         # Insert initial data once when table is created
-        bank_count = cursor.execute('SELECT COUNT(*) FROM bank').fetchone()[0]
-        if bank_count == 0:
+        account_count = cursor.execute('SELECT COUNT(*) FROM account').fetchone()[0]
+        if account_count == 0:
             cursor.executemany(
-                'INSERT INTO bank (name) VALUES (?)',
+                'INSERT INTO account (name) VALUES (?)',
                 [
                     ("Bank",),
                     ("Wallet",)
@@ -70,10 +70,10 @@ class DataBase:
                 category_id INTEGER,
                 description TEXT,
                 amount REAL,
-                bank_id  INTEGER,
+                account_id  INTEGER,
                 balance TEXT,
                 FOREIGN KEY (category_id) REFERENCES category(id)
-                FOREIGN KEY (bank_id) REFERENCES bank(id)
+                FOREIGN KEY (account_id) REFERENCES account(id)
             )
         ''')
         # Save transaction to database
