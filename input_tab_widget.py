@@ -1,8 +1,8 @@
 from PySide6.QtWidgets import (
-    QWidget, QTabWidget, QVBoxLayout,
-    QHBoxLayout, QLabel, QLineEdit,
-    QCalendarWidget, QComboBox, QPushButton,
-    QDialog, QFormLayout
+    QCalendarWidget, QComboBox, QDialog,
+    QFormLayout, QHBoxLayout, QLabel,
+    QLineEdit, QPushButton, QTabWidget,
+    QVBoxLayout, QWidget
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QDoubleValidator
@@ -61,9 +61,13 @@ class InputTabWidget(QWidget):
         elif balance == 'income':
             self.income_categoty_combo = category_combo
         # Set value for the combobox from account database
-        account_names = self.data.fetch_query('SELECT name FROM account').fetchall()
+        account_names = self.data.fetch_query(
+            'SELECT name FROM account'
+        ).fetchall()
         # Get account input widget and variable for text
-        account_layout, account_combo = self.create_account_widget(account_names)
+        account_layout, account_combo = self.create_account_widget(
+            account_names
+        )
         # Set variable for account text from balance
         if balance == 'expense':
             self.expense_account_combo = account_combo
@@ -92,7 +96,7 @@ class InputTabWidget(QWidget):
         calendar = QCalendarWidget()
         calendar.setFirstDayOfWeek(Qt.DayOfWeek(1))
         calendar.setGridVisible(True)
-        calendar.setContentsMargins(60,30,60,30)
+        calendar.setContentsMargins(60, 30, 60, 30)
 
         return calendar
 

@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
-    QVBoxLayout, QLabel, QLineEdit,
-    QPushButton, QDialog
+    QDialog, QLabel, QLineEdit,
+    QPushButton, QVBoxLayout
 )
 
 

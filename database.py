@@ -42,7 +42,9 @@ class DataBase:
             )
         ''')
         # Insert initial data once when table is created
-        account_count = cursor.execute('SELECT COUNT(*) FROM account').fetchone()[0]
+        account_count = cursor.execute(
+            'SELECT COUNT(*) FROM account'
+        ).fetchone()[0]
         if account_count == 0:
             cursor.executemany(
                 'INSERT INTO account (name) VALUES (?)',

@@ -1,8 +1,8 @@
 import datetime
 from PySide6.QtWidgets import (
-    QWidget, QHBoxLayout, QGridLayout,
-    QGroupBox, QLabel, QPushButton,
-    QVBoxLayout, QDialog, QVBoxLayout
+    QDialog, QGridLayout, QGroupBox,
+    QHBoxLayout, QLabel, QPushButton,
+    QVBoxLayout, QWidget
 )
 from PySide6.QtCore import Qt
 from aggregate import AggregateData
@@ -110,8 +110,12 @@ class SummaryTabWidget(QWidget):
 
     def set_balance_label(self):
         # Get aggregated data
-        income_sum = self.aggregate_num.monthly_sum(self.current_date, 'income')
-        expense_sum = self.aggregate_num.monthly_sum(self.current_date, 'expense')
+        income_sum = self.aggregate_num.monthly_sum(
+            self.current_date, 'income'
+        )
+        expense_sum = self.aggregate_num.monthly_sum(
+            self.current_date, 'expense'
+        )
         balance_sum = self.aggregate_num.difference(income_sum, expense_sum)
         # Set aggregated data to UI
         self.income.setText(f'{income_sum}')
