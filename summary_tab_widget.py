@@ -2,7 +2,7 @@ import datetime
 from PySide6.QtWidgets import (
     QWidget, QHBoxLayout, QGridLayout,
     QGroupBox, QLabel, QPushButton,
-    QVBoxLayout, QDialog
+    QVBoxLayout, QDialog, QVBoxLayout
 )
 from PySide6.QtCore import Qt
 from aggregate import AggregateData
@@ -28,19 +28,17 @@ class SummaryTabWidget(QWidget):
 
     def create_summary_tab(self):
         summary_tab_layout = QVBoxLayout()
-        # Set Data to piechart
-        self.set_chart()
         # Add each widget to main layout
         summary_tab_layout.addLayout(self.create_year_month_widget())
         summary_tab_layout.addWidget(self.create_monthly_balance_widget())
-        summary_tab_layout.addWidget(self.pie_chart)
+        summary_tab_layout.addLayout(self.create_chart_widget())
         summary_tab_layout.addLayout(self.create_setting_widget())
         summary_tab_layout.setSpacing(10)
 
         return summary_tab_layout
 
     def create_year_month_widget(self):
-        year_month_box = QHBoxLayout()
+        year_month_layout = QHBoxLayout()
         # Set month label widget
         prev_button = QPushButton('prev')
         prev_button.setFixedWidth(40)
@@ -53,12 +51,12 @@ class SummaryTabWidget(QWidget):
         # Set process for when next button is clicked
         next_button.clicked.connect(self.next_button_clicked)
         # Set widget to month layout
-        year_month_box.addWidget(prev_button)
-        year_month_box.addWidget(self.year_month_label)
-        year_month_box.addWidget(next_button)
+        year_month_layout.addWidget(prev_button)
+        year_month_layout.addWidget(self.year_month_label)
+        year_month_layout.addWidget(next_button)
         self.set_year_month_label()
 
-        return year_month_box
+        return year_month_layout
 
     def create_monthly_balance_widget(self):
         monthly_balance_layout = QGridLayout()
@@ -160,6 +158,16 @@ class SummaryTabWidget(QWidget):
         self.set_year_month_label()
         self.set_balance_label()
         self.set_chart()
+
+    def create_chart_widget(self):
+        chart_layout = QVBoxLayout()
+        chart_label = QLabel('Monthly Expence by Category:')
+        # Set Data to piechart
+        self.set_chart()
+        chart_layout.addWidget(chart_label)
+        chart_layout.addWidget(self.pie_chart)
+
+        return chart_layout
 
     def set_chart(self):
         # Get balance sum for each category
