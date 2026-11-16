@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QWidget, QTabWidget, QVBoxLayout
-from summary_tab_widget import SummaryTabWidget
 from input_tab_widget import InputTabWidget
+from summary_tab_widget import SummaryTabWidget
 
 
 class TabWidget(QWidget):

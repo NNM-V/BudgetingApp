@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (
-    QFormLayout, QVBoxLayout, QLabel,
-    QLineEdit, QPushButton, QDialog,
-    QScrollArea, QWidget
+    QDialog, QFormLayout, QLabel,
+    QLineEdit, QPushButton, QScrollArea,
+    QVBoxLayout, QWidget
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QDoubleValidator

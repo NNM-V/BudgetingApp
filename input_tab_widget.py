@@ -1,8 +1,8 @@
 from PySide6.QtWidgets import (
-    QWidget, QTabWidget, QVBoxLayout,
-    QHBoxLayout, QLabel, QLineEdit,
-    QCalendarWidget, QComboBox, QPushButton,
-    QDialog
+    QCalendarWidget, QComboBox, QDialog,
+    QFormLayout, QHBoxLayout, QLabel,
+    QLineEdit, QPushButton, QTabWidget,
+    QVBoxLayout, QWidget
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QDoubleValidator
@@ -60,21 +60,25 @@ class InputTabWidget(QWidget):
             self.expense_category_combo = category_combo
         elif balance == 'income':
             self.income_categoty_combo = category_combo
-        # Set value for the combobox from bank database
-        bank_names = self.data.fetch_query('SELECT name FROM bank').fetchall()
-        # Get bank input widget and variable for text
-        bank_layout, bank_combo = self.create_bank_widget(bank_names)
-        # Set variable for bank text from balance
+        # Set value for the combobox from account database
+        account_names = self.data.fetch_query(
+            'SELECT name FROM account'
+        ).fetchall()
+        # Get account input widget and variable for text
+        account_layout, account_combo = self.create_account_widget(
+            account_names
+        )
+        # Set variable for account text from balance
         if balance == 'expense':
-            self.expense_bank_combo = bank_combo
+            self.expense_account_combo = account_combo
         elif balance == 'income':
-            self.income_bank_combo = bank_combo
+            self.income_account_combo = account_combo
         # Get input button widget
         input_button = self.create_input_button()
         input_button.clicked.connect(
             lambda: self.input_button_clicked(
                 date, item_input, money_input,
-                category_combo, bank_combo, balance
+                category_combo, account_combo, balance
             )
         )
         # Add each widget to main layout
@@ -82,7 +86,7 @@ class InputTabWidget(QWidget):
         input_tab_layout.addLayout(item_layout)
         input_tab_layout.addLayout(money_layout)
         input_tab_layout.addLayout(category_layout)
-        input_tab_layout.addLayout(bank_layout)
+        input_tab_layout.addLayout(account_layout)
         input_tab_layout.addWidget(input_button)
 
         return input_tab_layout
@@ -92,24 +96,25 @@ class InputTabWidget(QWidget):
         calendar = QCalendarWidget()
         calendar.setFirstDayOfWeek(Qt.DayOfWeek(1))
         calendar.setGridVisible(True)
+        calendar.setContentsMargins(60, 30, 60, 30)
 
         return calendar
 
     def create_item_widget(self):
-        item_layout = QHBoxLayout()
+        item_layout = QFormLayout()
         # Create item widget
         item_label = QLabel('Content:')
         item_input = QLineEdit()
         item_input.setPlaceholderText('Input content')
         item_input.setFixedWidth(250)
         # Set widget to layout
-        item_layout.addWidget(item_label)
-        item_layout.addWidget(item_input, alignment=Qt.AlignmentFlag.AlignLeft)
+        item_layout.addRow(item_label, item_input)
+        item_layout.setFormAlignment(Qt.AlignLeft)
 
         return item_layout, item_input
 
     def create_money_widget(self):
-        money_layout = QHBoxLayout()
+        money_layout = QFormLayout()
         # Create money widget
         money_label = QLabel('Amount:')
         money_input = QLineEdit()
@@ -118,10 +123,8 @@ class InputTabWidget(QWidget):
         money_input.setValidator(validator)
         money_input.setFixedWidth(250)
         # Set widget to layout
-        money_layout.addWidget(money_label)
-        money_layout.addWidget(
-            money_input, alignment=Qt.AlignmentFlag.AlignLeft
-        )
+        money_layout.addRow(money_label, money_input)
+        money_layout.setFormAlignment(Qt.AlignLeft)
 
         return money_layout, money_input
 
@@ -129,6 +132,7 @@ class InputTabWidget(QWidget):
         category_layout = QHBoxLayout()
         # Create category widget
         category_label = QLabel('Category:')
+        category_label.setFixedWidth(60)
         category_combo = self.set_combobox(values)
         category_button = QPushButton("+")
         category_button.setFixedWidth(50)
@@ -137,36 +141,31 @@ class InputTabWidget(QWidget):
             lambda: self.category_button_clicked(balance)
         )
         # Set widget to layout
-        category_layout.addWidget(
-            category_label, alignment=Qt.AlignmentFlag.AlignLeft
-        )
-        category_layout.addWidget(
-            category_combo, alignment=Qt.AlignmentFlag.AlignLeft
-        )
-        category_layout.addWidget(
-            category_button, alignment=Qt.AlignmentFlag.AlignLeft
-        )
+        category_layout.addWidget(category_label)
+        category_layout.addWidget(category_combo)
+        category_layout.addWidget(category_button)
+        category_layout.addStretch()
 
         return category_layout, category_combo
 
-    def create_bank_widget(self, values):
-        bank_layout = QHBoxLayout()
-        # Set expense bank layout
-        bank_label = QLabel('Account:')
-        bank_combo = QComboBox()
-        bank_combo = self.set_combobox(values)
-        bank_button = QPushButton('+')
-        bank_button.setFixedWidth(50)
-        # Set process for when bank_button is clicked
-        bank_button.clicked.connect(self.bank_button_clicked)
+    def create_account_widget(self, values):
+        account_layout = QHBoxLayout()
+        # Set expense account layout
+        account_label = QLabel('Account:')
+        account_label.setFixedWidth(60)
+        account_combo = QComboBox()
+        account_combo = self.set_combobox(values)
+        account_button = QPushButton('+')
+        account_button.setFixedWidth(50)
+        # Set process for when account_button is clicked
+        account_button.clicked.connect(self.account_button_clicked)
         # Set widget to layout
-        bank_layout.addWidget(bank_label, alignment=Qt.AlignmentFlag.AlignLeft)
-        bank_layout.addWidget(bank_combo, alignment=Qt.AlignmentFlag.AlignLeft)
-        bank_layout.addWidget(
-            bank_button, alignment=Qt.AlignmentFlag.AlignLeft
-        )
+        account_layout.addWidget(account_label)
+        account_layout.addWidget(account_combo)
+        account_layout.addWidget(account_button)
+        account_layout.addStretch()
 
-        return bank_layout, bank_combo
+        return account_layout, account_combo
 
     def set_combobox(self, values):
         # Create combobox
@@ -191,12 +190,13 @@ class InputTabWidget(QWidget):
     def create_input_button(self):
         # Create record button
         record_button = QPushButton('Record')
+        record_button.setFixedWidth(120)
 
         return record_button
 
     def input_button_clicked(
             self, calendar, item_input, money_input,
-            category_input, bank_input, balance
+            category_input, account_input, balance
     ):
         # Get data from calendar
         date = calendar.selectedDate().toString('yyyy-MM-dd')
@@ -214,17 +214,17 @@ class InputTabWidget(QWidget):
                 category, balance
             )
         ).fetchone()
-        # Get bank name from textbox and find the ID throgh database
-        bank = bank_input.currentText()
-        bank_id = self.data.fetch_query(
-            'SELECT id FROM bank WHERE name = ?', (bank,)
+        # Get account name from textbox and find the ID throgh database
+        account = account_input.currentText()
+        account_id = self.data.fetch_query(
+            'SELECT id FROM account WHERE name = ?', (account,)
         ).fetchone()
         # Insert data into database
         self.data.exe_query(
             'INSERT INTO report (date, category_id, description, \
-            amount, bank_id, balance) VALUES(?,?,?,?,?,?)', (
+            amount, account_id, balance) VALUES(?,?,?,?,?,?)', (
                 date, str(category_id[0]), item,
-                money, str(bank_id[0]), balance
+                money, str(account_id[0]), balance
             )
         )
         # Clear out data from text box
@@ -256,14 +256,14 @@ class InputTabWidget(QWidget):
         else:
             return
 
-    def bank_button_clicked(self):
-        bank = self.subwin_result()
+    def account_button_clicked(self):
+        account = self.subwin_result()
         # Set input to combo box if input exists
-        if bank is not None:
+        if account is not None:
             self.data.exe_query(
-                'INSERT INTO bank(name) VALUES(?)', (bank,)
+                'INSERT INTO account(name) VALUES(?)', (account,)
             )
-            self.expense_bank_combo.addItem(bank)
-            self.income_bank_combo.addItem(bank)
+            self.expense_account_combo.addItem(account)
+            self.income_account_combo.addItem(account)
         else:
             return
