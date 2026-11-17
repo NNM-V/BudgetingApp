@@ -7,7 +7,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         # Window title
-        self.setWindowTitle('家計簿')
+        self.setWindowTitle('Budgeting App')
         # Window size
         self.setGeometry(200, 200, 500, 600)
         # Set tab
