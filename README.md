@@ -22,7 +22,7 @@ A GUI budgeting application that tracks and calculates monthly balance based on 
 ## ScreenShots
 <img width=50% alt="Image" src="https://github.com/user-attachments/assets/1506b816-6197-4888-8929-be9673fd5812" />
 
-<img width=50% alt="Image" src="https://github.com/user-attachments/assets/824f8d63-2b8e-4a72-8341-95ad145a634e />
+<img width=50% alt="Image" src="https://github.com/user-attachments/assets/824f8d63-2b8e-4a72-8341-95ad145a634e" />
 
 <img width=50% alt="Image" src="https://github.com/user-attachments/assets/3bae948e-3656-4db5-af02-7e6bad74d237" />
 
